@@ -2,6 +2,7 @@ package com.lefkovitzj.sermonarchive;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.Objects;
 @Entity
 public class SermonMedia {
     @Id
-    private Integer uuid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String title;
     private String description;
     private String resourceUrl;
@@ -22,8 +24,8 @@ public class SermonMedia {
     public SermonMedia() {
     }
 
-    public SermonMedia(Integer uuid, String title, String description, String resourceUrl, String speaker, List<String> tags, boolean isVideo, boolean isPublished) {
-        this.uuid = uuid;
+    public SermonMedia(Integer id, String title, String description, String resourceUrl, String speaker, List<String> tags, boolean isVideo, boolean isPublished) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.resourceUrl = resourceUrl;
@@ -33,8 +35,8 @@ public class SermonMedia {
         this.isPublished = isPublished;
     }
 
-    public Integer getUuid() {
-        return uuid;
+    public Integer getid() {
+        return id;
     }
 
     public String getTitle() {
@@ -65,8 +67,8 @@ public class SermonMedia {
         return isPublished;
     }
 
-    public void setUuid(Integer uuid) {
-        this.uuid = uuid;
+    public void setid(Integer id) {
+        this.id = id;
     }
 
     public void setTitle(String title) {
@@ -101,11 +103,11 @@ public class SermonMedia {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         SermonMedia that = (SermonMedia) o;
-        return isVideo == that.isVideo && isPublished == that.isPublished && Objects.equals(uuid, that.uuid) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(resourceUrl, that.resourceUrl) && Objects.equals(speaker, that.speaker) && Objects.equals(tags, that.tags);
+        return isVideo == that.isVideo && isPublished == that.isPublished && Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(resourceUrl, that.resourceUrl) && Objects.equals(speaker, that.speaker) && Objects.equals(tags, that.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, title, description, resourceUrl, speaker, tags, isVideo, isPublished);
+        return Objects.hash(id, title, description, resourceUrl, speaker, tags, isVideo, isPublished);
     }
 }
