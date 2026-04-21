@@ -1,9 +1,15 @@
 package com.lefkovitzj.sermonarchive;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+
 import java.util.List;
 import java.util.Objects;
 
+@Entity
 public class SermonMedia {
+    @Id
     private Integer uuid;
     private String title;
     private String description;
