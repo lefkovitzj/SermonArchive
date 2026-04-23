@@ -1,6 +1,7 @@
 package com.lefkovitzj.sermonarchive;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,5 +15,10 @@ public class SermonMediaService {
 
     public List<SermonMedia> getSermonMedia() {
         return sermonMediaRepository.findAll();
+    }
+
+    @Transactional
+    public void addSermonMedia(SermonMedia sermonMedia) {
+        sermonMediaRepository.save(sermonMedia);
     }
 }

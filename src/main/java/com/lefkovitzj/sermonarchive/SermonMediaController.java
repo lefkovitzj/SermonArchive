@@ -1,8 +1,7 @@
 package com.lefkovitzj.sermonarchive;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,8 +15,14 @@ public class SermonMediaController {
         this.sermonMediaService = sermonMediaService;
     }
 
-    @GetMapping
+    @GetMapping()
     public List<SermonMedia> getSermonMedia() {
         return sermonMediaService.getSermonMedia();
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<String> addSermonMedia(@RequestBody SermonMedia newSermonMedia) {
+        sermonMediaService.addSermonMedia(newSermonMedia);
+        return ResponseEntity.ok("Sermon media " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully.");
     }
 }
