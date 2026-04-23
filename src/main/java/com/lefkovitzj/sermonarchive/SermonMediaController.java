@@ -25,4 +25,10 @@ public class SermonMediaController {
         sermonMediaService.addSermonMedia(newSermonMedia);
         return ResponseEntity.ok("Sermon media " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully.");
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<String> updateSermonMedia(@RequestBody SermonMedia updatedSermonMedia) {
+        sermonMediaService.updateSermonMedia(updatedSermonMedia);
+        return ResponseEntity.ok("Sermon media " + updatedSermonMedia.getTitle() + " by " + updatedSermonMedia.getSpeaker() + " was updated successfully.");
+    }
 }

@@ -21,4 +21,9 @@ public class SermonMediaService {
     public void addSermonMedia(SermonMedia sermonMedia) {
         sermonMediaRepository.save(sermonMedia);
     }
+
+    @Transactional
+    public void updateSermonMedia(SermonMedia updatedSermonMedia) {
+        sermonMediaRepository.save(updatedSermonMedia);
+    }
 }
