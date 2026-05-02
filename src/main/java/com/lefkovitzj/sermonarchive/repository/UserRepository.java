@@ -1,7 +1,7 @@
-package com.lefkovitzj.sermonarchive;
+package com.lefkovitzj.sermonarchive.repository;
 
+import com.lefkovitzj.sermonarchive.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.expression.spel.ast.NullLiteral;
 
 import java.util.List;
 

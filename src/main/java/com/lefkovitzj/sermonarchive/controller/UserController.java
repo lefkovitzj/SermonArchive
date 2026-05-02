@@ -1,5 +1,7 @@
-package com.lefkovitzj.sermonarchive;
+package com.lefkovitzj.sermonarchive.controller;
 
+import com.lefkovitzj.sermonarchive.service.UserService;
+import com.lefkovitzj.sermonarchive.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

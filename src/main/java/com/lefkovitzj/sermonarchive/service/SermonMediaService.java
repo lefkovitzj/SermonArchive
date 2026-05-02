@@ -1,5 +1,7 @@
-package com.lefkovitzj.sermonarchive;
+package com.lefkovitzj.sermonarchive.service;
 
+import com.lefkovitzj.sermonarchive.entity.SermonMedia;
+import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

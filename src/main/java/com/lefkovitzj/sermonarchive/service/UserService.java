@@ -1,5 +1,7 @@
-package com.lefkovitzj.sermonarchive;
+package com.lefkovitzj.sermonarchive.service;
 
+import com.lefkovitzj.sermonarchive.entity.User;
+import com.lefkovitzj.sermonarchive.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

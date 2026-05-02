@@ -1,34 +1,25 @@
-package com.lefkovitzj.sermonarchive;
+package com.lefkovitzj.sermonarchive.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Objects;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(unique = true)
     private String username;
     private String password;
     private List<String> roles;
+    @Column(unique = true)
     private String email;
-
-
-    public User() {
-    }
-
-    public User(Integer id, String username, String password, List<String> roles, String email) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
-        this.email = email;
-    }
 
     public Integer getId() {
         return id;
