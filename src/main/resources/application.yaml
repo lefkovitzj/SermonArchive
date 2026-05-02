@@ -9,13 +9,13 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         default_schema: public
-        format_sql: true
-    show-sql: true
-  jwt:
-    secret: EueJZwlh7pEpVPHzDYjybR0xMwxtCxIRkFvGdqjZMro
-    expiration: 360000
+        format_sql: false
+    show-sql: false
+jwt:
+  secret: EueJZwlh7pEpVPHzDYjybR0xMwxtCxIRkFvGdqjZMro
+  expiration: 360000
 
