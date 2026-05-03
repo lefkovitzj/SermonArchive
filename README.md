@@ -153,7 +153,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@lefkovitzj](https://github.com/lefkovitzj) - contact@lefkovitzj.com
+Joseph Lefkovitz - [@lefkovitzj](https://github.com/lefkovitzj) - contact@lefkovitzj.com
 
 Project Link: [https://github.com/lefkovitzj/SermonArchive](https://github.com/lefkovitzj/SermonArchive)
 
