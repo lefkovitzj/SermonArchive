@@ -1,10 +1,12 @@
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   application:
     name: SermonArchive
   datasource:
-    url: jdbc:postgresql://localhost:5332/sermonmedia?currentSchema=public
-    username: postgres
-    password: password
+    url: "${DB_URL}"
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -16,6 +18,11 @@ spring:
         format_sql: false
     show-sql: false
 jwt:
-  secret: EueJZwlh7pEpVPHzDYjybR0xMwxtCxIRkFvGdqjZMro
+  secret: "${JWT_SECRET}"
   expiration: 360000
-
+s3:
+  endpoint: "${S3_ENDPOINT}"
+  access-key: "${S3_ACCESS_KEY}"
+  secret-key: "${S3_SECRET_KEY}"
+  bucket-name: "${S3_BUCKET_NAME}"
+  region: "${S3_REGION}"
