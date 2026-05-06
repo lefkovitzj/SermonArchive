@@ -4,6 +4,7 @@ import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,10 +23,12 @@ public class SermonMediaController {
         return sermonMediaService.getSermonMedia();
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<String> addSermonMedia(@RequestBody SermonMedia newSermonMedia) {
-        sermonMediaService.addSermonMedia(newSermonMedia);
-        return ResponseEntity.ok("Sermon media " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully.");
+    @PostMapping(value = "/add")
+    public ResponseEntity<String> addSermonMedia(
+            @ModelAttribute SermonMedia newSermonMedia,
+            @RequestParam("sermonFile") MultipartFile sermonFile) {
+        sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
+        return ResponseEntity.ok("Sermon media " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
     }
 
     @PutMapping("/update")
