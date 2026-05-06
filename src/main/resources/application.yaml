@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 128MB
+      max-request-size: 128MB
   config:
     import: "optional:file:.env[.properties]"
   application:
@@ -26,3 +30,4 @@ s3:
   secret-key: "${S3_SECRET_KEY}"
   bucket-name: "${S3_BUCKET_NAME}"
   region: "${S3_REGION}"
+  public-url-pattern: "${S3_PUBLIC_URL_PATTERN}"
