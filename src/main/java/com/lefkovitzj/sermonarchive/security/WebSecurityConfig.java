@@ -46,7 +46,14 @@ public class WebSecurityConfig {
                 .sessionManagement(s ->
                         s.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->
-                        a.requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Allow certain enpoints.
+                        a.requestMatchers(
+                                "/api/v1/sermon-media/add/**",
+                                        "/api/v1/sermon-media/download/**",
+                                        "/api/v1/auth/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html"
+                                ).permitAll() // Allow certain enpoints.
                                 .anyRequest().authenticated() // Require auth for all others.
                 );
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
