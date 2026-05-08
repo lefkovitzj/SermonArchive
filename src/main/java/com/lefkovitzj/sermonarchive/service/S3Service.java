@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @Service public class S3Service {
     @Value("${s3.public-url-pattern}") String publicUrlPattern;
@@ -35,15 +36,13 @@ import java.io.IOException;
         return getUploadedObjectUrl(bucketName, file.getOriginalFilename());
     }
 
-    public byte[] downloadFile(String s3Key) {
+    public InputStream downloadFile(String s3Key) {
         // Request the file from s3 and store it as a byte array.
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(s3Key)
                 .build();
-        byte[] s3FileData = s3Client.getObject(getObjectRequest, ResponseTransformer.toBytes()).asByteArray();
-
-        // Return the byte data for the file.
-        return s3FileData;
+        // Return the data stream
+        return s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
     }
 }

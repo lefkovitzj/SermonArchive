@@ -2,6 +2,7 @@ package com.lefkovitzj.sermonarchive.controller;
 
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
+import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -41,16 +43,29 @@ public class SermonMediaController {
         return ResponseEntity.ok("Sermon media " + updatedSermonMedia.getTitle() + " by " + updatedSermonMedia.getSpeaker() + " was updated successfully.");
     }
     @GetMapping("/download/{sermonId}")
-    public ResponseEntity<byte[]> downloadSermon(@PathVariable Integer sermonId) {
+    public ResponseEntity<InputStreamResource> downloadSermon(@PathVariable Integer sermonId) {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
             return ResponseEntity.notFound().build();
         }
         // Get the bytes and format them for the response.
-        byte[] downloadableBytes = sermonMediaService.getFileForDownload(sermonMedia);
+        InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "\"")
-                .body(downloadableBytes);
+                .body(new InputStreamResource(mediaStream));
+    }
+    @GetMapping("/embed/{sermonId}")
+    public ResponseEntity<InputStreamResource> embedSermon(@PathVariable Integer sermonId) {
+        SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
+        // Check that the sermon was accessible (exists and published).
+        if (sermonMedia == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // Get the bytes and format them for the response.
+        InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "\"")
+                .body(new InputStreamResource(mediaStream));
     }
 }

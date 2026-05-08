@@ -49,6 +49,7 @@ public class WebSecurityConfig {
                         a.requestMatchers(
                                 "/api/v1/sermon-media/add/**",
                                         "/api/v1/sermon-media/download/**",
+                                        "/api/v1/sermon-media/embed/**",
                                         "/api/v1/auth/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",

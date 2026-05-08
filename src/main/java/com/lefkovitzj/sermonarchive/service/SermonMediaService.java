@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -59,11 +60,8 @@ public class SermonMediaService {
         return sermonMedia;
     }
 
-    public byte[] getFileForDownload(SermonMedia sermonMedia) {
-        // Use the S3Service to get the bytes for the download target file.
-        byte[] s3FileData = s3Service.downloadFile(sermonMedia.getS3Key());
-
+    public InputStream getFileForDownload(SermonMedia sermonMedia) {
         // Return the download target file bytes as an attachment.
-        return s3FileData;
+        return s3Service.downloadFile(sermonMedia.getS3Key());
     }
 }
