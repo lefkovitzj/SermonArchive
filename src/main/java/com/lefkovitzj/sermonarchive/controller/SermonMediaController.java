@@ -1,26 +1,23 @@
 package com.lefkovitzj.sermonarchive.controller;
 
-import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
+import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.ResponseTransformer;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/sermon-media")
-public class SermonMediaController {
+@RequestMapping("api/v1/sermon-media/video")
+public class SermonVideoController {
 
     private final SermonMediaService sermonMediaService;
 
-    public SermonMediaController(SermonMediaService sermonMediaService) {
+    public SermonVideoController(SermonMediaService sermonMediaService) {
         this.sermonMediaService = sermonMediaService;
     }
 
@@ -33,15 +30,17 @@ public class SermonMediaController {
     public ResponseEntity<String> addSermonMedia(
             @ModelAttribute SermonMedia newSermonMedia,
             @RequestParam("sermonFile") MultipartFile sermonFile) {
+        if (!sermonMediaService.isMedia(sermonFile)) {
+            return ResponseEntity.badRequest().body("Invalid sermon media file type.");
+        }
+        if (!sermonMediaService.isVideo(sermonFile)) {
+            return ResponseEntity.badRequest().body("Invalid sermon media file type - must be video not audio.");
+        }
+        newSermonMedia.setVideo(true);
         sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
-        return ResponseEntity.ok("Sermon media " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
+        return ResponseEntity.ok("Sermon video " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> updateSermonMedia(@RequestBody SermonMedia updatedSermonMedia) {
-        sermonMediaService.updateSermonMedia(updatedSermonMedia);
-        return ResponseEntity.ok("Sermon media " + updatedSermonMedia.getTitle() + " by " + updatedSermonMedia.getSpeaker() + " was updated successfully.");
-    }
     @GetMapping("/download/{sermonId}")
     public ResponseEntity<InputStreamResource> downloadSermon(@PathVariable Integer sermonId) {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);

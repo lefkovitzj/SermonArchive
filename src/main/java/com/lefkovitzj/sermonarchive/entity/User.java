@@ -10,6 +10,7 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name="app_users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
