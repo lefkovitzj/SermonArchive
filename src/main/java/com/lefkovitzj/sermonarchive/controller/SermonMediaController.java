@@ -60,6 +60,7 @@ public class SermonMediaController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "\"")
                 .body(new InputStreamResource(mediaStream));
     }
+
     @GetMapping("/embed/{sermonId}")
     public ResponseEntity<InputStreamResource> embedSermon(@PathVariable Integer sermonId) {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
@@ -72,5 +73,27 @@ public class SermonMediaController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "\"")
                 .body(new InputStreamResource(mediaStream));
+    }
+
+    @PutMapping("/publish/{sermonId}")
+    public ResponseEntity<String> publishSermon(@PathVariable Integer sermonId) {
+        /* Make the sermon media published. */
+        boolean status = sermonMediaService.publishSermonMedia(sermonId);
+        if (! status) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok("Published sermon media with id " + sermonId + " successfully");
+    }
+
+    @PutMapping("/private/{sermonId}")
+    public ResponseEntity<String> privateSermon(@PathVariable Integer sermonId) {
+        /* Make the sermon media private if published. */
+        boolean status = sermonMediaService.privateSermonMedia(sermonId);
+        if (! status) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok("Privated sermon media with id " + sermonId + " successfully");
     }
 }

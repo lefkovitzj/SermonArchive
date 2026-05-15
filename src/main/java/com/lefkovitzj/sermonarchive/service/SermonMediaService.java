@@ -4,6 +4,7 @@ import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,18 +76,54 @@ public class SermonMediaService {
         sermonMediaRepository.save(updatedSermonMedia);
     }
 
-    public SermonMedia getSermonMediaById(Integer sermonId) {
+    public SermonMedia getSermonMediaById(Integer sermonId, boolean includeUnpublished) {
+        /* Get sermon media given its integer ID, with an optional arg to allow unpublished media */
         SermonMedia sermonMedia = sermonMediaRepository.findById(sermonId).orElse(null);
 
-        // Ensure the existence and publication of the requested sermon.
-        if (sermonMedia == null || (sermonMedia != null && ! sermonMedia.isPublished())) {
-            return null;
+        if (! includeUnpublished) {
+            // Do not include any unpublished sermon media.
+            // Ensure the existence and publication of the requested sermon.
+            if (sermonMedia != null && !sermonMedia.isPublished()) {
+                return null;
+            }
         }
         return sermonMedia;
+    }
+
+    public SermonMedia getSermonMediaById(Integer sermonId) {
+        /* Overload the getSermonMediaById to default to no unpublished media if not specified. */
+        return getSermonMediaById(sermonId, false);
     }
 
     public InputStream getFileForDownload(SermonMedia sermonMedia) {
         // Return the download target file bytes as an attachment.
         return s3Service.downloadFile(sermonMedia.getS3Key());
+    }
+
+    @Transactional
+    public boolean publishSermonMedia(Integer sermonId) {
+        SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
+        // Check that the sermon was accessible (exists, whether published or not).
+        if (sermonMedia == null) {
+            return false;
+        }
+
+        // Publish the media (even if already published).
+        sermonMedia.setPublished(true);
+        return true;
+    }
+
+    @Transactional
+    public boolean privateSermonMedia(Integer sermonId) {
+        SermonMedia sermonMedia = getSermonMediaById(sermonId);
+        // Check that the sermon was accessible (exists and published).
+        if (sermonMedia == null) {
+            // Sermon media does not exist or is not published.
+            return false;
+        }
+
+        // The sermon media exists and is published.
+        sermonMedia.setPublished(false);
+        return true;
     }
 }
