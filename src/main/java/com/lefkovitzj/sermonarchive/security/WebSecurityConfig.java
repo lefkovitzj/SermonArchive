@@ -47,9 +47,7 @@ public class WebSecurityConfig {
                         s.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->
                         a.requestMatchers(
-                                "/api/v1/sermon-media/add/**",
-                                        "/api/v1/sermon-media/download/**",
-                                        "/api/v1/sermon-media/embed/**",
+                                "/api/v1/sermon-media/**",
                                         "/error/**",
                                         "/api/v1/auth/**",
                                         "/v3/api-docs/**",
