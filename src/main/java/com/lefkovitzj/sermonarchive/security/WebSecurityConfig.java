@@ -50,6 +50,7 @@ public class WebSecurityConfig {
                                 "/api/v1/sermon-media/add/**",
                                         "/api/v1/sermon-media/download/**",
                                         "/api/v1/sermon-media/embed/**",
+                                        "/error/**",
                                         "/api/v1/auth/**",
                                         "/v3/api-docs/**",
                                         "/swagger-ui/**",
