@@ -2,6 +2,7 @@ package com.lefkovitzj.sermonarchive.service;
 
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-
 @Service
 public class SermonMediaService {
     @Autowired
@@ -20,10 +20,35 @@ public class SermonMediaService {
     private final S3Client s3Client;
     private final SermonMediaRepository sermonMediaRepository;
 
+    public final List<String> videoFileExts = List.of(
+            "mp4",
+            "webm"
+    );
+    public final List<String> audioFileExts = List.of(
+            "mp3"
+    );
+
     public SermonMediaService(SermonMediaRepository sermonMediaRepository,
                               S3Client s3Client) {
         this.s3Client = s3Client;
         this.sermonMediaRepository = sermonMediaRepository;
+    }
+
+    public String getExt(@NonNull MultipartFile file) {
+        /* Get the file extension. */
+        return  file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1);
+    }
+    public boolean isVideo(MultipartFile file) {
+        /* Check whether the file is an accepted video file. */
+        return videoFileExts.contains(getExt(file));
+    }
+    public boolean isAudio(MultipartFile file) {
+        /* Check whether the file is an accepted audio file. */
+        return audioFileExts.contains(getExt(file));
+    }
+    public boolean isMedia(MultipartFile file) {
+        /* Check whether the file is an accepted media (audio or video) file. */
+        return isVideo(file) || isAudio(file);
     }
 
     public List<SermonMedia> getSermonMedia() {

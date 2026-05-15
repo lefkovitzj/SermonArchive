@@ -12,12 +12,12 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/sermon-media/video")
-public class SermonVideoController {
+@RequestMapping("api/v1/sermon-media")
+public class SermonMediaController {
 
     private final SermonMediaService sermonMediaService;
 
-    public SermonVideoController(SermonMediaService sermonMediaService) {
+    public SermonMediaController(SermonMediaService sermonMediaService) {
         this.sermonMediaService = sermonMediaService;
     }
 
@@ -31,14 +31,20 @@ public class SermonVideoController {
             @ModelAttribute SermonMedia newSermonMedia,
             @RequestParam("sermonFile") MultipartFile sermonFile) {
         if (!sermonMediaService.isMedia(sermonFile)) {
-            return ResponseEntity.badRequest().body("Invalid sermon media file type.");
+            return ResponseEntity.badRequest().body("Invalid sermon media file type (" + sermonMediaService.getExt(sermonFile) + ")");
         }
-        if (!sermonMediaService.isVideo(sermonFile)) {
-            return ResponseEntity.badRequest().body("Invalid sermon media file type - must be video not audio.");
+        if (sermonMediaService.isVideo(sermonFile)) {
+            // A video file.
+            newSermonMedia.setVideo(true);
         }
-        newSermonMedia.setVideo(true);
+        else {
+            // An audio file.
+            newSermonMedia.setVideo(false);
+        }
+
+        // Upload the file.
         sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
-        return ResponseEntity.ok("Sermon video " + newSermonMedia.getTitle() + " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
+        return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
     }
 
     @GetMapping("/download/{sermonId}")
