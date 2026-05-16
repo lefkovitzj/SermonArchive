@@ -37,7 +37,7 @@ public class SermonMediaController {
         return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
     }
 
-    @GetMapping("/download/{sermonId}")
+    @GetMapping("/{sermonId}/download")
     public ResponseEntity<InputStreamResource> downloadSermon(@PathVariable Integer sermonId) {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
@@ -51,7 +51,7 @@ public class SermonMediaController {
                 .body(new InputStreamResource(mediaStream));
     }
 
-    @GetMapping("/embed/{sermonId}")
+    @GetMapping("/{sermonId}/embed")
     public ResponseEntity<InputStreamResource> embedSermon(@PathVariable Integer sermonId) {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
@@ -65,7 +65,7 @@ public class SermonMediaController {
                 .body(new InputStreamResource(mediaStream));
     }
 
-    @PutMapping("/publish/{sermonId}")
+    @PutMapping("/{sermonId}/publish")
     public ResponseEntity<String> publishSermon(@PathVariable Integer sermonId) {
         /* Make the sermon media published. */
         boolean status = sermonMediaService.publishSermonMedia(sermonId);
@@ -76,7 +76,7 @@ public class SermonMediaController {
         return ResponseEntity.ok("Published sermon media with id " + sermonId + " successfully");
     }
 
-    @PutMapping("/private/{sermonId}")
+    @PutMapping("/{sermonId}/private")
     public ResponseEntity<String> privateSermon(@PathVariable Integer sermonId) {
         /* Make the sermon media private if published. */
         boolean status = sermonMediaService.privateSermonMedia(sermonId);
@@ -88,7 +88,7 @@ public class SermonMediaController {
     }
 
     /* Tag the sermon media. */
-    @PostMapping("/tags/{sermonId}")
+    @PostMapping("/{sermonId}/tags")
     public ResponseEntity<String> setSermonTags(@PathVariable Integer sermonId, @RequestBody List<String> tags) {
         boolean status = sermonMediaService.updateSermonMediaTags(sermonId, tags);
         if (! status) {
@@ -98,7 +98,7 @@ public class SermonMediaController {
         return ResponseEntity.ok("Updated tags " + tags.toString() + " for sermon media with id " + sermonId + " successfully");
     }
 
-    @PutMapping("/tags/{sermonId}/{tag}")
+    @PutMapping("/{sermonId}/tags/{tag}")
     public ResponseEntity<String> tagSermon(@PathVariable Integer sermonId, @PathVariable String tag) {
         boolean status = sermonMediaService.addSermonMediaTag(sermonId, tag);
         if (! status) {
@@ -108,7 +108,7 @@ public class SermonMediaController {
         return ResponseEntity.ok("Added tag " + tag + " to sermon media with id " + sermonId + " successfully");
     }
 
-    @DeleteMapping("/tags/{sermonId}/{tag}")
+    @DeleteMapping("/{sermonId}/tags/{tag}")
     public ResponseEntity<String> deleteSermonTag(@PathVariable Integer sermonId, @PathVariable String tag) {
         boolean status = sermonMediaService.removeSermonMediaTag(sermonId, tag);
         if (! status) {
