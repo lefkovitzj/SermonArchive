@@ -36,6 +36,11 @@ public class SermonMedia {
 
     @Setter
     @Getter
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Church church;
+
+    @Setter
+    @Getter
     private List<String> tags =  new ArrayList<>();
 
     @Setter
@@ -80,12 +85,12 @@ public class SermonMedia {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         SermonMedia that = (SermonMedia) o;
-        return isVideo == that.isVideo && isPublished == that.isPublished && Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(resourceUrl, that.resourceUrl) && Objects.equals(speaker, that.speaker) && Objects.equals(tags, that.tags) && Objects.equals(s3Key, that.s3Key);
+        return isVideo == that.isVideo && isPublished == that.isPublished && Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(resourceUrl, that.resourceUrl) && Objects.equals(speaker, that.speaker) && Objects.equals(church, that.church) && Objects.equals(tags, that.tags) && Objects.equals(sermonDatetime, that.sermonDatetime) && Objects.equals(s3Key, that.s3Key) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, resourceUrl, speaker, tags, isVideo, isPublished, s3Key);
+        return Objects.hash(id, title, description, resourceUrl, speaker, church, tags, isVideo, isPublished, sermonDatetime, s3Key, createdAt, updatedAt);
     }
 
     public void appendTag(String tag) {

@@ -1,11 +1,15 @@
 package com.lefkovitzj.sermonarchive.controller;
 
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
+import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
+import com.lefkovitzj.sermonarchive.service.UserService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,16 +22,27 @@ import java.util.List;
 public class SermonMediaController {
 
     private final SermonMediaService sermonMediaService;
+    private final ChurchService churchService;
 
-    public SermonMediaController(SermonMediaService sermonMediaService) {
+    public SermonMediaController(SermonMediaService sermonMediaService,
+                                 ChurchService churchService) {
         this.sermonMediaService = sermonMediaService;
+        this.churchService = churchService;
     }
 
     /* Upload, download, and stream sermon media. */
     @PostMapping(value = "/add")
     public ResponseEntity<String> addSermonMedia(
+            @AuthenticationPrincipal UserDetails userDetails,
             @ModelAttribute SermonMedia newSermonMedia,
-            @RequestParam("sermonFile") MultipartFile sermonFile) {
+            @RequestParam("sermonFile") MultipartFile sermonFile,
+            @RequestParam("churchName") String churchName) {
+        if (! churchService.churchExists(churchName)) {
+            return ResponseEntity.badRequest().body("Media cannot be added to non-existent church '" + churchName + "'");
+        }
+        if (! churchService.verifyOwnership(churchName, userDetails)) {
+            return ResponseEntity.badRequest().body("User '" + userDetails.getUsername() + "' is not authorized to add media for the church '" + churchName + "'");
+        }
         if (!sermonMediaService.isMedia(sermonFile)) {
             return ResponseEntity.badRequest().body("Invalid sermon media file type (" + sermonMediaService.getExt(sermonFile) + ")");
         }
