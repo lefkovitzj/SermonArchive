@@ -24,6 +24,9 @@ public class UserService {
     public User searchUserById(int id) {
         return userRepository.findById(id).orElse(null);
     }
+    public User getByName(String username) {
+        return userRepository.findByUsername(username);
+    }
 
     @Transactional
     public void addUser(User user) {
