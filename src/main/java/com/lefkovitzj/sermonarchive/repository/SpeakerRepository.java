@@ -1,0 +1,10 @@
+package com.lefkovitzj.sermonarchive.repository;
+
+import com.lefkovitzj.sermonarchive.entity.Speaker;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface SpeakerRepository extends JpaRepository<Speaker, Integer> {
+    Speaker findByName(String speaker);
+}
