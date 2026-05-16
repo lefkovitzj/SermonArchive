@@ -1,10 +1,8 @@
 package com.lefkovitzj.sermonarchive.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +15,7 @@ public class SermonMedia {
     private String description;
     private String resourceUrl;
     private String speaker;
-    private List<String> tags;
+    private List<String> tags =  new ArrayList<>();
     private boolean isVideo;
     private boolean isPublished;
     public String s3Key;
@@ -119,5 +117,17 @@ public class SermonMedia {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, description, resourceUrl, speaker, tags, isVideo, isPublished, s3Key);
+    }
+
+    public void appendTag(String tag) {
+        this.tags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        this.tags.remove(tag);
+    }
+
+    public boolean containsTag(String tag) {
+        return this.tags.contains(tag);
     }
 }

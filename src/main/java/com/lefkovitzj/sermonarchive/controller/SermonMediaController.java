@@ -33,14 +33,6 @@ public class SermonMediaController {
         if (!sermonMediaService.isMedia(sermonFile)) {
             return ResponseEntity.badRequest().body("Invalid sermon media file type (" + sermonMediaService.getExt(sermonFile) + ")");
         }
-        if (sermonMediaService.isVideo(sermonFile)) {
-            // A video file.
-            newSermonMedia.setVideo(true);
-        }
-        else {
-            // An audio file.
-            newSermonMedia.setVideo(false);
-        }
 
         // Upload the file.
         sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
@@ -95,5 +87,35 @@ public class SermonMediaController {
         }
 
         return ResponseEntity.ok("Privated sermon media with id " + sermonId + " successfully");
+    }
+
+    @PostMapping("/tags/{sermonId}")
+    public ResponseEntity<String> setSermonTags(@PathVariable Integer sermonId, @RequestBody List<String> tags) {
+        boolean status = sermonMediaService.updateSermonMediaTags(sermonId, tags);
+        if (! status) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok("Updated tags " + tags.toString() + " for sermon media with id " + sermonId + " successfully");
+    }
+
+    @PutMapping("/tags/{sermonId}/{tag}")
+    public ResponseEntity<String> tagSermon(@PathVariable Integer sermonId, @PathVariable String tag) {
+        boolean status = sermonMediaService.addSermonMediaTag(sermonId, tag);
+        if (! status) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok("Added tag " + tag + " to sermon media with id " + sermonId + " successfully");
+    }
+
+    @DeleteMapping("/tags/{sermonId}/{tag}")
+    public ResponseEntity<String> deleteSermonTag(@PathVariable Integer sermonId, @PathVariable String tag) {
+        boolean status = sermonMediaService.removeSermonMediaTag(sermonId, tag);
+        if (! status) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok("Deleted tag " + tag + " from sermon media with id " + sermonId + " successfully");
     }
 }

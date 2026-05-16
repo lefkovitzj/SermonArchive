@@ -4,7 +4,6 @@ import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +11,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,6 +55,9 @@ public class SermonMediaService {
     public List<SermonMedia> getSermonMedia() {
         return sermonMediaRepository.findAll();
     }
+    public List<SermonMedia> getSermonMedia(String tag) {
+        return sermonMediaRepository.findAll().stream().filter(sermonMedia -> sermonMedia.containsTag(tag)).toList();
+    }
 
     @Transactional
     public boolean addSermonMedia(SermonMedia sermonMedia, MultipartFile file) {
@@ -63,17 +66,15 @@ public class SermonMediaService {
             // Update the sermonMedia object to reflect the uploaded location.
             sermonMedia.setResourceUrl(uploadedUrl);
             sermonMedia.setS3Key(file.getOriginalFilename());
+            if (isVideo(file)) {
+                sermonMedia.setVideo(true);
+            }
             sermonMediaRepository.save(sermonMedia);
             return true;
         }
         catch (IOException e) {
             return false;
         }
-    }
-
-    @Transactional
-    public void updateSermonMedia(SermonMedia updatedSermonMedia) {
-        sermonMediaRepository.save(updatedSermonMedia);
     }
 
     public SermonMedia getSermonMediaById(Integer sermonId, boolean includeUnpublished) {
@@ -124,6 +125,42 @@ public class SermonMediaService {
 
         // The sermon media exists and is published.
         sermonMedia.setPublished(false);
+        return true;
+    }
+
+    @Transactional
+    public boolean addSermonMediaTag(Integer sermonId, String tag) {
+        SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
+        // Check that the sermon was accessible (exists, whether published or not).
+        if (sermonMedia == null) {
+            return false;
+        }
+
+        sermonMedia.appendTag(tag);
+        return true;
+    }
+
+    @Transactional
+    public boolean removeSermonMediaTag(Integer sermonId, String tag) {
+        SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
+        // Check that the sermon was accessible (exists, whether published or not).
+        if (sermonMedia == null) {
+            return false;
+        }
+
+        sermonMedia.removeTag(tag);
+        return true;
+    }
+
+    @Transactional
+    public boolean updateSermonMediaTags(Integer sermonId, List<String> tags) {
+        SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
+        // Check that the sermon was accessible (exists, whether published or not).
+        if (sermonMedia == null) {
+            return false;
+        }
+
+        sermonMedia.setTags(tags);
         return true;
     }
 }
