@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,8 +13,6 @@ import java.util.Objects;
 
 @Entity
 public class SermonMedia {
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -34,7 +31,8 @@ public class SermonMedia {
 
     @Setter
     @Getter
-    private String speaker;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Speaker speaker;
 
     @Setter
     @Getter
@@ -66,7 +64,7 @@ public class SermonMedia {
     public SermonMedia() {
     }
 
-    public SermonMedia(Integer id, String title, String description, String resourceUrl, String speaker, List<String> tags, boolean isVideo, boolean isPublished, String s3Key) {
+    public SermonMedia(Integer id, String title, String description, String resourceUrl, Speaker speaker, List<String> tags, boolean isVideo, boolean isPublished, String s3Key) {
         this.id = id;
         this.title = title;
         this.description = description;

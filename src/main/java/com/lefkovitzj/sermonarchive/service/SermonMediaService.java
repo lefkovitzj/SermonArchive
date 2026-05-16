@@ -1,6 +1,7 @@
 package com.lefkovitzj.sermonarchive.service;
 
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
+import com.lefkovitzj.sermonarchive.entity.Speaker;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.Objects;
 public class SermonMediaService {
     @Autowired
     private S3Service s3Service;
+    private SpeakerService speakerService;
     private final S3Client s3Client;
     private final SermonMediaRepository sermonMediaRepository;
 
@@ -31,8 +33,10 @@ public class SermonMediaService {
     );
 
     public SermonMediaService(SermonMediaRepository sermonMediaRepository,
+                              SpeakerService speakerService,
                               S3Client s3Client) {
         this.s3Client = s3Client;
+        this.speakerService = speakerService;
         this.sermonMediaRepository = sermonMediaRepository;
     }
 
@@ -67,10 +71,11 @@ public class SermonMediaService {
 
     public List<SermonMedia> getSermonMediaBySpeaker(String speaker) {
         /* Get all sermon media from a given speaker. */
+        Speaker querySpeaker = speakerService.getSpeakerByName(speaker);
         return sermonMediaRepository.findAll()
                 .stream()
                 .filter(
-                        sermonMedia -> Objects.equals(sermonMedia.getSpeaker(), speaker)
+                        sermonMedia -> Objects.equals(sermonMedia.getSpeaker(), querySpeaker)
                 ).toList();
     }
     public List<SermonMedia> getSermonMediaBetweenTimes(LocalDateTime  start, LocalDateTime end) {
@@ -84,6 +89,7 @@ public class SermonMediaService {
     @Transactional
     public boolean addSermonMedia(SermonMedia sermonMedia, MultipartFile file) {
         try {
+            // Upload the file to s3.
             String uploadedUrl = s3Service.uploadFile(file);
             // Update the sermonMedia object to reflect the uploaded location.
             sermonMedia.setResourceUrl(uploadedUrl);
