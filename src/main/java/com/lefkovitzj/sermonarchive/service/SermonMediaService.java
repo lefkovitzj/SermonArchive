@@ -11,8 +11,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SermonMediaService {
@@ -55,8 +56,29 @@ public class SermonMediaService {
     public List<SermonMedia> getSermonMedia() {
         return sermonMediaRepository.findAll();
     }
-    public List<SermonMedia> getSermonMedia(String tag) {
-        return sermonMediaRepository.findAll().stream().filter(sermonMedia -> sermonMedia.containsTag(tag)).toList();
+    public List<SermonMedia> getSermonMediaByTag(String tag) {
+        /* Get all sermon media with a given tag. */
+        return sermonMediaRepository.findAll()
+                .stream()
+                .filter(
+                        sermonMedia -> sermonMedia.containsTag(tag)
+                ).toList();
+    }
+
+    public List<SermonMedia> getSermonMediaBySpeaker(String speaker) {
+        /* Get all sermon media from a given speaker. */
+        return sermonMediaRepository.findAll()
+                .stream()
+                .filter(
+                        sermonMedia -> Objects.equals(sermonMedia.getSpeaker(), speaker)
+                ).toList();
+    }
+    public List<SermonMedia> getSermonMediaBetweenTimes(LocalDateTime  start, LocalDateTime end) {
+        return sermonMediaRepository.findAll()
+                .stream()
+                .filter(
+                        sermonMedia -> (start.isBefore(sermonMedia.getSermonDatetime()) && end.isAfter(sermonMedia.getSermonDatetime()))
+                ).toList();
     }
 
     @Transactional

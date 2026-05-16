@@ -1,24 +1,67 @@
 package com.lefkovitzj.sermonarchive.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 public class SermonMedia {
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Setter
+    @Getter
     private String title;
+
+    @Setter
+    @Getter
     private String description;
+
+    @Setter
+    @Getter
     private String resourceUrl;
+
+    @Setter
+    @Getter
     private String speaker;
+
+    @Setter
+    @Getter
     private List<String> tags =  new ArrayList<>();
+
+    @Setter
+    @Getter
     private boolean isVideo;
+
+    @Setter
+    @Getter
     private boolean isPublished;
+
+    @Setter
+    @Getter
+    private LocalDateTime sermonDatetime;
+
+    @Setter
+    @Getter
     public String s3Key;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
 
     public SermonMedia() {
     }
@@ -32,78 +75,6 @@ public class SermonMedia {
         this.tags = tags;
         this.isVideo = isVideo;
         this.isPublished = isPublished;
-        this.s3Key = s3Key;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getResourceUrl() {
-        return resourceUrl;
-    }
-
-    public void setResourceUrl(String resourceUrl) {
-        this.resourceUrl = resourceUrl;
-    }
-
-    public String getSpeaker() {
-        return speaker;
-    }
-
-    public void setSpeaker(String speaker) {
-        this.speaker = speaker;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public boolean isVideo() {
-        return isVideo;
-    }
-
-    public void setVideo(boolean video) {
-        isVideo = video;
-    }
-
-    public boolean isPublished() {
-        return isPublished;
-    }
-
-    public void setPublished(boolean published) {
-        isPublished = published;
-    }
-
-    public String getS3Key() {
-        return s3Key;
-    }
-
-    public void setS3Key(String s3Key) {
         this.s3Key = s3Key;
     }
 

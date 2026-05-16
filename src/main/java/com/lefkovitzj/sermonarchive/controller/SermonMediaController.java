@@ -3,12 +3,14 @@ package com.lefkovitzj.sermonarchive.controller;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,11 +23,7 @@ public class SermonMediaController {
         this.sermonMediaService = sermonMediaService;
     }
 
-    @GetMapping()
-    public List<SermonMedia> getSermonMedia() {
-        return sermonMediaService.getSermonMedia();
-    }
-
+    /* Upload, download, and stream sermon media. */
     @PostMapping(value = "/add")
     public ResponseEntity<String> addSermonMedia(
             @ModelAttribute SermonMedia newSermonMedia,
@@ -89,6 +87,7 @@ public class SermonMediaController {
         return ResponseEntity.ok("Privated sermon media with id " + sermonId + " successfully");
     }
 
+    /* Tag the sermon media. */
     @PostMapping("/tags/{sermonId}")
     public ResponseEntity<String> setSermonTags(@PathVariable Integer sermonId, @RequestBody List<String> tags) {
         boolean status = sermonMediaService.updateSermonMediaTags(sermonId, tags);
@@ -117,5 +116,32 @@ public class SermonMediaController {
         }
 
         return ResponseEntity.ok("Deleted tag " + tag + " from sermon media with id " + sermonId + " successfully");
+    }
+
+    /* Query the sermon media. */
+    @GetMapping()
+    public ResponseEntity<List<SermonMedia>> getSermonMedia(
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) String speaker,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+
+        // Filter by Tag
+        if (tag != null && !tag.trim().isEmpty()) {
+            return ResponseEntity.ok(sermonMediaService.getSermonMediaByTag(tag));
+        }
+
+        // Filter by Speaker
+        if (speaker != null && !speaker.trim().isEmpty()) {
+            return ResponseEntity.ok(sermonMediaService.getSermonMediaBySpeaker(speaker));
+        }
+
+        // Filter by Date Range
+        if (start != null && end != null) {
+            return ResponseEntity.ok(sermonMediaService.getSermonMediaBetweenTimes(start, end));
+        }
+
+        // Return all sermons if no query parameters are provided
+        return ResponseEntity.ok(sermonMediaService.getSermonMedia());
     }
 }
