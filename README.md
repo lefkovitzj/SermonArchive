@@ -78,6 +78,14 @@
 ## About The Project
 
 This project serves as a tool for storing, classifying, and accessing media archives of church sermon series.
+It is a backend-only API solution currently, though might be augmented with a frontend at a later point or by 
+another contributor. 
+
+This project is intended to serve as my practice and learning playground prior to starting an internship for 
+Summer 2026 in which I will need to use Spring Boot. As a result, many mistakes may be made and code may not be done 
+optimally the first time around. I also am relying extensively on online examples, documentation, and Artificial 
+Intelligence tools (GitHub Copilot, Google Gemini in particular) for general Spring Boot advice and when 
+troubleshooting errors I haven't seen before. 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -92,30 +100,28 @@ This project serves as a tool for storing, classifying, and accessing media arch
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- GETTING STARTED -->
-## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Account creation for churches
-- [ ] Media upload
-  - [ ] S3 file storage integration 
-  - [ ] Audio recording upload 
-  - [ ] Video recording upload
-- [ ] Media access
-  - [ ] Media streaming
-  - [ ] Media download
+- [x] Account creation for churches
+- [x] Media upload
+  - [x] S3 file storage integration 
+  - [x] Audio recording upload 
+  - [x] Video recording upload
+- [x] Media access
+  - [x] Media streaming
+  - [x] Media download
 - [ ] Media classification
-  - [ ] Sermon series
-  - [ ] Preacher/speaker
+  - [x] Sermon series
+  - [x] Preacher/speaker
   - [ ] Automatically classified by date
+- [ ] Add logging
+- [ ] Containerize for AWS ECR
+  - [ ] Create GitHub action to rebuild and publish to ECR 
+  - [ ] Create GitHub action to rebuild and publish to DockerHub
+- [ ] Add test suite
+  - [ ] Define test cases
+  - [ ] Create GitHub actions for test CI
 
 See the [open issues](https://github.com/lefkovitzj/SermonArchive/issues) for a full list of proposed features (and known issues).
 
