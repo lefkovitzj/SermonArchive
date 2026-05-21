@@ -172,7 +172,7 @@ Project Link: [https://github.com/lefkovitzj/SermonArchive](https://github.com/l
 [issues-shield]: https://img.shields.io/github/issues/lefkovitzj/SermonArchive.svg?style=for-the-badge
 [issues-url]: https://github.com/lefkovitzj/SermonArchive/issues
 [license-shield]: https://img.shields.io/github/license/lefkovitzj/SermonArchive.svg?style=for-the-badge
-[license-url]: https://github.com/lefkovitzj/SermonArchive/blob/master/LICENSE.txt
+[license-url]: https://github.com/lefkovitzj/SermonArchive/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/joseph-lefkovitz
 
