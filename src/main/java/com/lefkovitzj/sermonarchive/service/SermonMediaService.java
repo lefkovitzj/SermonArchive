@@ -93,7 +93,7 @@ public class SermonMediaService {
     public boolean addSermonMedia(SermonMedia sermonMedia, MultipartFile file) {
         try {
             // Upload the file to s3.
-            String uploadedUrl = s3Service.uploadFile(file);
+            String uploadedUrl = s3Service.uploadFile(file, sermonMedia.getId());
             // Update the sermonMedia object to reflect the uploaded location.
             sermonMedia.setResourceUrl(uploadedUrl);
             sermonMedia.setS3Key(file.getOriginalFilename());
@@ -129,7 +129,7 @@ public class SermonMediaService {
 
     public InputStream getFileForDownload(SermonMedia sermonMedia) {
         // Return the download target file bytes as an attachment.
-        return s3Service.downloadFile(sermonMedia.getS3Key());
+        return s3Service.downloadFile(sermonMedia.getS3Key(), sermonMedia.getId());
     }
 
     @Transactional

@@ -4,6 +4,8 @@ import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import com.lefkovitzj.sermonarchive.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -21,6 +24,7 @@ import java.util.List;
 @RequestMapping("api/v1/sermon-media")
 public class SermonMediaController {
 
+    private final Logger logger = LoggerFactory.getLogger(SermonMediaController.class);
     private final SermonMediaService sermonMediaService;
     private final ChurchService churchService;
 
@@ -57,13 +61,23 @@ public class SermonMediaController {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
+            logger.warn("Download requested for missing or unpublished sermon ID [{}]", sermonId);
             return ResponseEntity.notFound().build();
         }
         // Get the bytes and format them for the response.
-        InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "\"")
-                .body(new InputStreamResource(mediaStream));
+        try {
+
+            InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "\"")
+                    .body(new InputStreamResource(mediaStream));
+        }
+        catch (Exception e) {
+            logger.error("Failed to download file for sermon ID [{}] (Title: '{}')",
+                    sermonId, sermonMedia.getTitle(), e);
+
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/{sermonId}/embed")
@@ -71,13 +85,23 @@ public class SermonMediaController {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
+            logger.warn("Embed requested for missing or unpublished sermon ID [{}]", sermonId);
             return ResponseEntity.notFound().build();
         }
         // Get the bytes and format them for the response.
-        InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "\"")
-                .body(new InputStreamResource(mediaStream));
+        try {
+            InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "\"")
+                    .body(new InputStreamResource(mediaStream));
+        }
+        catch (Exception e) {
+            // The S3 interaction (most likely) or other logic failed.
+            logger.error("Failed to stream file for sermon ID [{}] (Title: '{}')",
+                    sermonId, sermonMedia.getTitle(), e);
+
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("/{sermonId}/publish")
