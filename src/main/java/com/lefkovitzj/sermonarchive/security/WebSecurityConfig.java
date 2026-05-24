@@ -1,5 +1,6 @@
 package com.lefkovitzj.sermonarchive.security;
 
+import com.lefkovitzj.sermonarchive.filter.AuthTokenFilter;
 import com.lefkovitzj.sermonarchive.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
