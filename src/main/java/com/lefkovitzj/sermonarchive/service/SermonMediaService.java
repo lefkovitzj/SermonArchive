@@ -182,7 +182,7 @@ public class SermonMediaService {
 
         // The sermon media exists and is published.
         sermonMedia.setPublished(false);
-        logger.info("Privated sermon media {}", sermonId);
+        logger.info("Made private sermon media {}", sermonId);
         return true;
     }
 
@@ -215,7 +215,7 @@ public class SermonMediaService {
         }
 
         if  (! sermonMedia.getTags().contains(tag)) {
-            logger.info("Skipping remove tag {} to sermon media {} - not present",  tag, sermonId);
+            logger.info("Skipping remove tag {} from sermon media {} - not present",  tag, sermonId);
             return true;
         }
         else {
