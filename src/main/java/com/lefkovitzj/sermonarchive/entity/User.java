@@ -13,6 +13,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     @Setter
     private Integer id;
 

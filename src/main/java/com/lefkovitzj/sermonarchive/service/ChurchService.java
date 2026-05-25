@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service public class ChurchService {
     private static final Logger logger = LoggerFactory.getLogger(ChurchService.class);
@@ -54,7 +55,7 @@ import java.util.List;
         if (church == null || currentUser == null) {
             return false;
         }
-        return church.owner == currentUser;
+        return Objects.equals(church.owner.getId(), currentUser.getId());
     }
 
 }
