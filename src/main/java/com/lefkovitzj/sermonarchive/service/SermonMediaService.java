@@ -6,6 +6,8 @@ import com.lefkovitzj.sermonarchive.entity.Speaker;
 import com.lefkovitzj.sermonarchive.entity.User;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.Objects;
 
 @Service
 public class SermonMediaService {
+    private static final Logger logger = LoggerFactory.getLogger(SermonMediaService.class);
     @Autowired
     private S3Service s3Service;
     private SpeakerService speakerService;
@@ -137,11 +140,16 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot publish sermon media {} - DNE",  sermonId);
             return false;
+        }
+        if (sermonMedia.isPublished()) {
+            logger.info("Skipping publish sermon media {} - already published", sermonId);
         }
 
         // Publish the media (even if already published).
         sermonMedia.setPublished(true);
+        logger.info("Published sermon media {}", sermonId);
         return true;
     }
 
@@ -151,11 +159,13 @@ public class SermonMediaService {
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
             // Sermon media does not exist or is not published.
+            logger.warn("Cannot private sermon media {} - DNE or private already",  sermonId);
             return false;
         }
 
         // The sermon media exists and is published.
         sermonMedia.setPublished(false);
+        logger.info("Privated sermon media {}", sermonId);
         return true;
     }
 
@@ -164,10 +174,17 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot add tag {} to sermon media {} - DNE or private", tag, sermonId);
             return false;
         }
 
-        sermonMedia.appendTag(tag);
+        if (sermonMedia.getTags().contains(tag)) {
+            logger.info("Skipping add tag {} to sermon media {} - already present",  tag, sermonId);
+        }
+        else {
+            sermonMedia.appendTag(tag);
+            logger.info("Added tags {} to sermon media {}", tag, sermonId);
+        }
         return true;
     }
 
@@ -176,10 +193,18 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot remove tag {} from sermon media {} - DNE or private", tag, sermonId);
             return false;
         }
 
-        sermonMedia.removeTag(tag);
+        if  (! sermonMedia.getTags().contains(tag)) {
+            logger.info("Skipping remove tag {} to sermon media {} - not present",  tag, sermonId);
+            return true;
+        }
+        else {
+            sermonMedia.removeTag(tag);
+            logger.info("Removed tags {} from sermon media {}", tag, sermonId);
+        }
         return true;
     }
 
@@ -188,10 +213,12 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot add tags {} to sermon media {} - DNE or private", tags.toString(), sermonId);
             return false;
         }
 
         sermonMedia.setTags(tags);
+        logger.info("Adding tags {} to sermon media {}", tags.toString(), sermonId);
         return true;
     }
 }
