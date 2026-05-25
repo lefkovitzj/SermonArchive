@@ -35,11 +35,6 @@ public class SermonMedia {
 
     @Setter
     @Getter
-    @Schema(description = "The S3 object store public access URL for the sermon, if S3 is configured for public access.")
-    private String resourceUrl;
-
-    @Setter
-    @Getter
     @Schema(description = "The speaker who preached the sermon.")
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Speaker speaker;
@@ -83,11 +78,10 @@ public class SermonMedia {
     @Schema(description = "Internal system lastmod time.")
     private LocalDateTime updatedAt;
 
-    public SermonMedia(Integer id, String title, String description, String resourceUrl, Speaker speaker, List<String> tags, boolean isVideo, boolean isPublished, String s3Key) {
+    public SermonMedia(Integer id, String title, String description, Speaker speaker, List<String> tags, boolean isVideo, boolean isPublished, String s3Key) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.resourceUrl = resourceUrl;
         this.speaker = speaker;
         this.tags = tags;
         this.isVideo = isVideo;

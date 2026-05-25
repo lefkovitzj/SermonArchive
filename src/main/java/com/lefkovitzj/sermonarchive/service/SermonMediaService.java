@@ -94,19 +94,36 @@ public class SermonMediaService {
 
     @Transactional
     public boolean addSermonMedia(SermonMedia sermonMedia, MultipartFile file) {
+        /* Process the file upload and new sermon media object, adding them to the db and S3. */
         try {
-            // Upload the file to s3.
-            String uploadedUrl = s3Service.uploadFile(file, sermonMedia.getId());
-            // Update the sermonMedia object to reflect the uploaded location.
-            sermonMedia.setResourceUrl(uploadedUrl);
-            sermonMedia.setS3Key(file.getOriginalFilename());
+            logger.info("Starting upload of new sermon from file upload '{}'", file.getOriginalFilename());
+            // Handle file types.
             if (isVideo(file)) {
+                // File is video.
                 sermonMedia.setVideo(true);
             }
+            else if (isAudio(file)) {
+                // File is audio.
+                sermonMedia.setVideo(false);
+            }
+            else {
+                // File is neither video nor audio.
+                logger.warn("Could not add sermon media {} from uploaded file - invalid file extension",  file.getOriginalFilename());
+                return false;
+            }
+            // Save the new sermon media object to the db.
             sermonMediaRepository.save(sermonMedia);
+            Integer sermonId = sermonMedia.getId();
+            logger.info("Added sermon media {}", sermonId);
+
+            // Upload the file to s3.
+            String uniqueKey = s3Service.uploadFile(file, sermonId);
+            sermonMedia.setS3Key(uniqueKey);
+            logger.info("Uploaded sermon media {} to S3 {} as {}",  sermonId, (sermonMedia.isVideo() ? "video" : "audio"), uniqueKey);
             return true;
         }
-        catch (IOException e) {
+        catch (Exception e) {
+            logger.error("Could not add sermon media from uploaded file {}", file.getOriginalFilename(), e);
             return false;
         }
     }

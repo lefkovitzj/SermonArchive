@@ -53,7 +53,7 @@ public class SermonMediaController {
 
         // Upload the file.
         sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
-        return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
+        return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded with key '" + newSermonMedia.getS3Key() + "'.");
     }
 
     @GetMapping("/{sermonId}/download")

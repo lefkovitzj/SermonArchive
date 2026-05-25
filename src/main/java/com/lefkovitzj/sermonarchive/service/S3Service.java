@@ -27,9 +27,6 @@ import java.io.InputStream;
     @Value("${s3.bucket-name}") String bucketName;
     @Autowired
     S3Client s3Client;
-    public String getUploadedObjectUrl(String bucketName, String key) {
-        return publicUrlPattern.replace("{bucket}", bucketName).replace("{key}", key);
-    }
 
     public String uploadFile(MultipartFile file, Integer sermonId) throws IOException {
         // Create the object to write to s3 from the uploaded file.
@@ -48,7 +45,7 @@ import java.io.InputStream;
             throw new RuntimeException("S3 upload failed for sermon " + sermonId, e);
         }
 
-        return getUploadedObjectUrl(bucketName, uniqueKey);
+        return uniqueKey;
     }
 
     public InputStream downloadFile(String s3Key, Integer sermonId) {
