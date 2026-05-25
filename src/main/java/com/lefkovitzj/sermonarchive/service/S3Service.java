@@ -36,7 +36,7 @@ import java.io.InputStream;
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         }
         catch (SdkException e) {
-            logger.error("S3 upload failed for sermon {} -> {}", sermonId, e);
+            logger.error("S3 upload failed for sermon {}", sermonId, e);
             throw new RuntimeException("S3 upload failed for sermon " + sermonId, e);
         }
 
@@ -56,7 +56,7 @@ import java.io.InputStream;
             return returnStream;
         }
         catch (SdkException e) {
-            logger.error("S3 download failed for sermon {} -> {}", sermonId, e);
+            logger.error("S3 download failed for sermon {}", sermonId, e);
             throw new RuntimeException("S3 download failed for sermon " + sermonId, e);
         }
     }
