@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: local
   servlet:
     multipart:
       max-file-size: 128MB
@@ -9,6 +7,9 @@ spring:
     import: "optional:file:.env[.properties]"
   application:
     name: SermonArchive
+  profiles:
+    default: local
+    active: "${LOGGING_PROFILE}"
   datasource:
     url: "${DB_URL}"
     username: "${DB_USERNAME}"
