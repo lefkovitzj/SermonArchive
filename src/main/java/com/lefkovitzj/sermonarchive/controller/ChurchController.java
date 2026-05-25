@@ -18,7 +18,7 @@ public class ChurchController {
     private final ChurchService churchService;
     private final UserService userService;
 
-    public ChurchController(ChurchService churchService, SpeakerService speakerService, UserService userService) {
+    public ChurchController(ChurchService churchService, UserService userService) {
         this.churchService = churchService;
         this.userService = userService;
     }
