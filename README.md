@@ -115,7 +115,7 @@ troubleshooting errors I haven't seen before.
   - [x] Sermon series
   - [x] Preacher/speaker
   - [ ] Automatically classified by date
-- [ ] Add logging
+- [x] Add logging
 - [ ] Containerize for AWS ECR
   - [ ] Create GitHub action to rebuild and publish to ECR 
   - [ ] Create GitHub action to rebuild and publish to DockerHub
