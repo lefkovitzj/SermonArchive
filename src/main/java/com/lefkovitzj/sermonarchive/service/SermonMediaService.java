@@ -1,21 +1,17 @@
 package com.lefkovitzj.sermonarchive.service;
 
-import com.lefkovitzj.sermonarchive.entity.Church;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.entity.Speaker;
-import com.lefkovitzj.sermonarchive.entity.User;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,8 +30,17 @@ public class SermonMediaService {
             "mp4",
             "webm"
     );
+    public final List<String> videoFileMimeTypes = List.of(
+            "video/mp4",
+            "video/webm"
+
+    );
     public final List<String> audioFileExts = List.of(
             "mp3"
+    );
+    public final List<String> audioFileMimeTypes = List.of(
+            "audio/mp3",
+            "audio/mpeg"
     );
 
     public SermonMediaService(SermonMediaRepository sermonMediaRepository,
@@ -52,11 +57,11 @@ public class SermonMediaService {
     }
     public boolean isVideo(MultipartFile file) {
         /* Check whether the file is an accepted video file. */
-        return videoFileExts.contains(getExt(file));
+        return videoFileExts.contains(getExt(file)) && videoFileMimeTypes.contains(file.getContentType());
     }
     public boolean isAudio(MultipartFile file) {
         /* Check whether the file is an accepted audio file. */
-        return audioFileExts.contains(getExt(file));
+        return audioFileExts.contains(getExt(file)) && audioFileMimeTypes.contains(file.getContentType());
     }
     public boolean isMedia(MultipartFile file) {
         /* Check whether the file is an accepted media (audio or video) file. */
@@ -111,15 +116,17 @@ public class SermonMediaService {
                 logger.warn("Could not add sermon media {} from uploaded file - invalid file extension",  file.getOriginalFilename());
                 return false;
             }
-            // Save the new sermon media object to the db.
-            sermonMediaRepository.save(sermonMedia);
-            Integer sermonId = sermonMedia.getId();
-            logger.info("Added sermon media {}", sermonId);
 
             // Upload the file to s3.
-            String uniqueKey = s3Service.uploadFile(file, sermonId);
+            String newFileExt = getExt(file);
+            sermonMedia.setFileExt(newFileExt);
+            String uniqueKey = s3Service.uploadFile(file, sermonMedia.getTitle(), newFileExt);
             sermonMedia.setS3Key(uniqueKey);
-            logger.info("Uploaded sermon media {} to S3 {} as {}",  sermonId, (sermonMedia.isVideo() ? "video" : "audio"), uniqueKey);
+            logger.info("Uploaded sermon media {} to S3 {} as {}",  sermonMedia.getTitle(), (sermonMedia.isVideo() ? "video" : "audio"), uniqueKey);
+
+            // Save the new sermon media object to the db.
+            sermonMediaRepository.save(sermonMedia);
+            logger.info("Added sermon media {}", sermonMedia.getTitle());
             return true;
         }
         catch (Exception e) {

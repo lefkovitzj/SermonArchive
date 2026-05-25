@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @Service public class S3Service {
     private static final Logger logger = LoggerFactory.getLogger(S3Service.class);
@@ -23,21 +24,21 @@ import java.io.InputStream;
     @Autowired
     S3Client s3Client;
 
-    public String uploadFile(MultipartFile file, Integer sermonId) throws IOException {
-        // Create the object to write to s3 from the uploaded file.
-        String uniqueKey  = "sermons/" + sermonId + "_" + file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, String sermonName, String fileExt) throws IOException {
+        /* Create the object to write to s3 from the uploaded file. */
+        String uniqueKey  = "sermons/" + UUID.randomUUID().toString() + fileExt;
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(uniqueKey)
                 .build();
         // Write the file and return its uploaded url.
-        logger.info("Starting file upload to S3 for sermon {} with file [{}] (size: {} bytes)", sermonId,  file.getOriginalFilename(), file.getSize());
+        logger.info("Starting file upload to S3 for sermon '{}' with file [{}] (size: {} bytes)", sermonName,  file.getOriginalFilename(), file.getSize());
         try {
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         }
         catch (SdkException e) {
-            logger.error("S3 upload failed for sermon {}", sermonId, e);
-            throw new RuntimeException("S3 upload failed for sermon " + sermonId, e);
+            logger.error("S3 upload failed for sermon '{}'", sermonName, e);
+            throw new RuntimeException("S3 upload failed for sermon " + sermonName, e);
         }
 
         return uniqueKey;

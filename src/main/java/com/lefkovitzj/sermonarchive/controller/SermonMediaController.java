@@ -50,7 +50,11 @@ public class SermonMediaController {
         }
 
         // Upload the file.
-        sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
+        boolean success = sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
+        if (!success) {
+            logger.error("Failed to add sermon media '{}' for church '{}'", newSermonMedia.getTitle(), churchName);
+            return ResponseEntity.internalServerError().body("Failed to add sermon media '" + newSermonMedia.getTitle() + "'.");
+        }
         return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded with key '" + newSermonMedia.getS3Key() + "'.");
     }
 
@@ -67,7 +71,7 @@ public class SermonMediaController {
 
             InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "." + sermonMedia.getFileExt() + "\"")
                     .body(new InputStreamResource(mediaStream));
         }
         catch (Exception e) {
@@ -90,7 +94,7 @@ public class SermonMediaController {
         try {
             InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "." + sermonMedia.getFileExt() +  "\"")
                     .body(new InputStreamResource(mediaStream));
         }
         catch (Exception e) {

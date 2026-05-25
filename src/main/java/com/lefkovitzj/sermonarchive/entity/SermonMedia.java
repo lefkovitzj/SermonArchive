@@ -55,9 +55,14 @@ public class SermonMedia {
     @Schema(description = "Media is a video if true, audio otherwise.")
     private boolean isVideo;
 
+    @Getter
+    @Setter
+    @Schema(description = "Store the initial upload extension.")
+    private String fileExt;
+
     @Setter
     @Getter
-    @Schema(description = "Media is a public if true, private otherwise.")
+    @Schema(description = "Media is public if true, private otherwise.")
     private boolean isPublished;
 
     @Setter
@@ -78,13 +83,14 @@ public class SermonMedia {
     @Schema(description = "Internal system lastmod time.")
     private LocalDateTime updatedAt;
 
-    public SermonMedia(Integer id, String title, String description, Speaker speaker, List<String> tags, boolean isVideo, boolean isPublished, String s3Key) {
+    public SermonMedia(Integer id, String title, String description, Speaker speaker, List<String> tags, boolean isVideo, String fileExt, boolean isPublished, String s3Key) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.speaker = speaker;
         this.tags = tags;
         this.isVideo = isVideo;
+        this.fileExt = fileExt;
         this.isPublished = isPublished;
         this.s3Key = s3Key;
     }
