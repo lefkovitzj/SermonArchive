@@ -54,8 +54,6 @@ import java.util.List;
         if (church == null || currentUser == null) {
             return false;
         }
-        System.out.println(church.owner);
-        System.out.println(currentUser);
         return church.owner == currentUser;
     }
 
