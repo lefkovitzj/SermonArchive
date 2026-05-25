@@ -1,13 +1,9 @@
 package com.lefkovitzj.sermonarchive.service;
 
-import com.lefkovitzj.sermonarchive.entity.SermonMedia;
-import com.lefkovitzj.sermonarchive.filter.LoggingFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -23,7 +19,6 @@ import java.io.InputStream;
 @Service public class S3Service {
     private static final Logger logger = LoggerFactory.getLogger(S3Service.class);
 
-    @Value("${s3.public-url-pattern}") String publicUrlPattern;
     @Value("${s3.bucket-name}") String bucketName;
     @Autowired
     S3Client s3Client;

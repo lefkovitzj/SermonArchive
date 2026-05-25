@@ -3,7 +3,6 @@ package com.lefkovitzj.sermonarchive.controller;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
-import com.lefkovitzj.sermonarchive.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -14,7 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.exception.SdkException;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
