@@ -26,7 +26,7 @@ import java.util.UUID;
 
     public String uploadFile(MultipartFile file, String sermonName, String fileExt) throws IOException {
         /* Create the object to write to s3 from the uploaded file. */
-        String uniqueKey  = "sermons/" + UUID.randomUUID().toString() + fileExt;
+        String uniqueKey  = "sermons/" + UUID.randomUUID().toString() + "." + fileExt;
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(uniqueKey)
