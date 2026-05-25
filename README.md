@@ -111,10 +111,10 @@ troubleshooting errors I haven't seen before.
 - [x] Media access
   - [x] Media streaming
   - [x] Media download
-- [ ] Media classification
+- [x] Media classification
   - [x] Sermon series
   - [x] Preacher/speaker
-  - [ ] Automatically classified by date
+  - [x] Date
 - [x] Add logging
 - [ ] Containerize for AWS ECR
   - [ ] Create GitHub action to rebuild and publish to ECR 
