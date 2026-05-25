@@ -245,4 +245,18 @@ public class SermonMediaService {
         logger.info("Adding tags {} to sermon media {}", tags.toString(), sermonId);
         return true;
     }
+
+    @Transactional
+    public boolean setSermonMediaTime(Integer sermonId, LocalDateTime newTime) {
+        SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
+        // Check that the sermon was accessible (exists, whether published or not).
+        if (sermonMedia == null) {
+            logger.warn("Cannot set time to {} for sermon media {} - DNE", newTime, sermonId);
+            return false;
+        }
+
+        sermonMedia.setSermonDatetime(newTime);
+        logger.info("Setting sermon media {} time to {}", sermonId, newTime);
+        return true;
+    }
 }

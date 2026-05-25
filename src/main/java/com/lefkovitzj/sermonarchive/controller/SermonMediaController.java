@@ -3,6 +3,7 @@ package com.lefkovitzj.sermonarchive.controller;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -157,6 +158,16 @@ public class SermonMediaController {
         }
 
         return ResponseEntity.ok("Deleted tag " + tag + " from sermon media with id " + sermonId + " successfully");
+    }
+
+    @PutMapping("/{sermonId}/time")
+    public ResponseEntity<String> setSermonTime(@PathVariable Integer sermonId, @RequestBody LocalDateTime time) {
+        boolean status = sermonMediaService.setSermonMediaTime(sermonId, time);
+        if (! status) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok("Set time to " + time + " for sermon media with id " + sermonId + " successfully");
     }
 
     /* Query the sermon media. */
