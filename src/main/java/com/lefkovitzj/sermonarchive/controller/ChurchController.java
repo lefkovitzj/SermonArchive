@@ -16,12 +16,10 @@ import java.util.List;
 @RequestMapping("/api/v1/church")
 public class ChurchController {
     private final ChurchService churchService;
-    private final SpeakerService speakerService;
     private final UserService userService;
 
-    public ChurchController(ChurchService churchService, SpeakerService speakerService, UserService userService) {
+    public ChurchController(ChurchService churchService, UserService userService) {
         this.churchService = churchService;
-        this.speakerService = speakerService;
         this.userService = userService;
     }
 

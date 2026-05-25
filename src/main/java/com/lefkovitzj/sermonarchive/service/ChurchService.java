@@ -5,14 +5,19 @@ import com.lefkovitzj.sermonarchive.entity.Speaker;
 import com.lefkovitzj.sermonarchive.entity.User;
 import com.lefkovitzj.sermonarchive.repository.ChurchRepository;
 import com.lefkovitzj.sermonarchive.repository.SpeakerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service public class ChurchService {
+    private static final Logger logger = LoggerFactory.getLogger(ChurchService.class);
+
     @Autowired
     private ChurchRepository  churchRepository;
     private UserService userService;
@@ -31,10 +36,12 @@ import java.util.List;
 
     @Transactional
     public void createNewChurch(String newName, User currentUser) {
+        logger.info("User '{}' creating new church '{}'", currentUser.getUsername(), newName);
         Church newChurch = new Church();
         newChurch.name = newName;
         newChurch.owner = currentUser;
         churchRepository.save(newChurch);
+        logger.info("New church '{}' created successfully", newName);
     }
 
     public boolean churchExists(String churchName) {
@@ -48,9 +55,7 @@ import java.util.List;
         if (church == null || currentUser == null) {
             return false;
         }
-        System.out.println(church.owner);
-        System.out.println(currentUser);
-        return church.owner == currentUser;
+        return Objects.equals(church.owner.getId(), currentUser.getId());
     }
 
 }

@@ -3,7 +3,8 @@ package com.lefkovitzj.sermonarchive.controller;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
-import com.lefkovitzj.sermonarchive.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("api/v1/sermon-media")
 public class SermonMediaController {
 
+    private final Logger logger = LoggerFactory.getLogger(SermonMediaController.class);
     private final SermonMediaService sermonMediaService;
     private final ChurchService churchService;
 
@@ -48,8 +50,12 @@ public class SermonMediaController {
         }
 
         // Upload the file.
-        sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
-        return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded to " + newSermonMedia.getResourceUrl() + ".");
+        boolean success = sermonMediaService.addSermonMedia(newSermonMedia, sermonFile);
+        if (!success) {
+            logger.error("Failed to add sermon media '{}' for church '{}'", newSermonMedia.getTitle(), churchName);
+            return ResponseEntity.internalServerError().body("Failed to add sermon media '" + newSermonMedia.getTitle() + "'.");
+        }
+        return ResponseEntity.ok("Sermon media '" + newSermonMedia.getTitle() + "' of type " + (newSermonMedia.isVideo() ? "video" : "audio") +  " by " + newSermonMedia.getSpeaker() + " was added successfully. Uploaded with key '" + newSermonMedia.getS3Key() + "'.");
     }
 
     @GetMapping("/{sermonId}/download")
@@ -57,13 +63,23 @@ public class SermonMediaController {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
+            logger.warn("Download requested for missing or unpublished sermon ID [{}]", sermonId);
             return ResponseEntity.notFound().build();
         }
         // Get the bytes and format them for the response.
-        InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "\"")
-                .body(new InputStreamResource(mediaStream));
+        try {
+
+            InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + sermonMedia.getTitle() + "." + sermonMedia.getFileExt() + "\"")
+                    .body(new InputStreamResource(mediaStream));
+        }
+        catch (Exception e) {
+            logger.error("Failed to download file for sermon ID [{}] (Title: '{}')",
+                    sermonId, sermonMedia.getTitle(), e);
+
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/{sermonId}/embed")
@@ -71,13 +87,23 @@ public class SermonMediaController {
         SermonMedia sermonMedia = sermonMediaService.getSermonMediaById(sermonId);
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
+            logger.warn("Embed requested for missing or unpublished sermon ID [{}]", sermonId);
             return ResponseEntity.notFound().build();
         }
         // Get the bytes and format them for the response.
-        InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "\"")
-                .body(new InputStreamResource(mediaStream));
+        try {
+            InputStream mediaStream = sermonMediaService.getFileForDownload(sermonMedia);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + sermonMedia.getTitle() + "." + sermonMedia.getFileExt() +  "\"")
+                    .body(new InputStreamResource(mediaStream));
+        }
+        catch (Exception e) {
+            // The S3 interaction (most likely) or other logic failed.
+            logger.error("Failed to stream file for sermon ID [{}] (Title: '{}')",
+                    sermonId, sermonMedia.getTitle(), e);
+
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("/{sermonId}/publish")

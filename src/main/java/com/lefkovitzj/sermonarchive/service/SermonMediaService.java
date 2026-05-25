@@ -1,19 +1,17 @@
 package com.lefkovitzj.sermonarchive.service;
 
-import com.lefkovitzj.sermonarchive.entity.Church;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.entity.Speaker;
-import com.lefkovitzj.sermonarchive.entity.User;
 import com.lefkovitzj.sermonarchive.repository.SermonMediaRepository;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +19,7 @@ import java.util.Objects;
 
 @Service
 public class SermonMediaService {
+    private static final Logger logger = LoggerFactory.getLogger(SermonMediaService.class);
     @Autowired
     private S3Service s3Service;
     private SpeakerService speakerService;
@@ -31,8 +30,17 @@ public class SermonMediaService {
             "mp4",
             "webm"
     );
+    public final List<String> videoFileMimeTypes = List.of(
+            "video/mp4",
+            "video/webm"
+
+    );
     public final List<String> audioFileExts = List.of(
             "mp3"
+    );
+    public final List<String> audioFileMimeTypes = List.of(
+            "audio/mp3",
+            "audio/mpeg"
     );
 
     public SermonMediaService(SermonMediaRepository sermonMediaRepository,
@@ -49,11 +57,11 @@ public class SermonMediaService {
     }
     public boolean isVideo(MultipartFile file) {
         /* Check whether the file is an accepted video file. */
-        return videoFileExts.contains(getExt(file));
+        return videoFileExts.contains(getExt(file)) && videoFileMimeTypes.contains(file.getContentType());
     }
     public boolean isAudio(MultipartFile file) {
         /* Check whether the file is an accepted audio file. */
-        return audioFileExts.contains(getExt(file));
+        return audioFileExts.contains(getExt(file)) && audioFileMimeTypes.contains(file.getContentType());
     }
     public boolean isMedia(MultipartFile file) {
         /* Check whether the file is an accepted media (audio or video) file. */
@@ -91,19 +99,38 @@ public class SermonMediaService {
 
     @Transactional
     public boolean addSermonMedia(SermonMedia sermonMedia, MultipartFile file) {
+        /* Process the file upload and new sermon media object, adding them to the db and S3. */
         try {
-            // Upload the file to s3.
-            String uploadedUrl = s3Service.uploadFile(file);
-            // Update the sermonMedia object to reflect the uploaded location.
-            sermonMedia.setResourceUrl(uploadedUrl);
-            sermonMedia.setS3Key(file.getOriginalFilename());
+            logger.info("Starting upload of new sermon from file upload '{}'", file.getOriginalFilename());
+            // Handle file types.
             if (isVideo(file)) {
+                // File is video.
                 sermonMedia.setVideo(true);
             }
+            else if (isAudio(file)) {
+                // File is audio.
+                sermonMedia.setVideo(false);
+            }
+            else {
+                // File is neither video nor audio.
+                logger.warn("Could not add sermon media {} from uploaded file - invalid file extension",  file.getOriginalFilename());
+                return false;
+            }
+
+            // Upload the file to s3.
+            String newFileExt = getExt(file);
+            sermonMedia.setFileExt(newFileExt);
+            String uniqueKey = s3Service.uploadFile(file, sermonMedia.getTitle(), newFileExt);
+            sermonMedia.setS3Key(uniqueKey);
+            logger.info("Uploaded sermon media {} to S3 {} as {}",  sermonMedia.getTitle(), (sermonMedia.isVideo() ? "video" : "audio"), uniqueKey);
+
+            // Save the new sermon media object to the db.
             sermonMediaRepository.save(sermonMedia);
+            logger.info("Added sermon media {}", sermonMedia.getTitle());
             return true;
         }
-        catch (IOException e) {
+        catch (Exception e) {
+            logger.error("Could not add sermon media from uploaded file {}", file.getOriginalFilename(), e);
             return false;
         }
     }
@@ -129,7 +156,7 @@ public class SermonMediaService {
 
     public InputStream getFileForDownload(SermonMedia sermonMedia) {
         // Return the download target file bytes as an attachment.
-        return s3Service.downloadFile(sermonMedia.getS3Key());
+        return s3Service.downloadFile(sermonMedia.getS3Key(), sermonMedia.getId());
     }
 
     @Transactional
@@ -137,11 +164,16 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot publish sermon media {} - DNE",  sermonId);
             return false;
+        }
+        if (sermonMedia.isPublished()) {
+            logger.info("Skipping publish sermon media {} - already published", sermonId);
         }
 
         // Publish the media (even if already published).
         sermonMedia.setPublished(true);
+        logger.info("Published sermon media {}", sermonId);
         return true;
     }
 
@@ -151,11 +183,13 @@ public class SermonMediaService {
         // Check that the sermon was accessible (exists and published).
         if (sermonMedia == null) {
             // Sermon media does not exist or is not published.
+            logger.warn("Cannot private sermon media {} - DNE or private already",  sermonId);
             return false;
         }
 
         // The sermon media exists and is published.
         sermonMedia.setPublished(false);
+        logger.info("Made private sermon media {}", sermonId);
         return true;
     }
 
@@ -164,10 +198,17 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot add tag {} to sermon media {} - DNE or private", tag, sermonId);
             return false;
         }
 
-        sermonMedia.appendTag(tag);
+        if (sermonMedia.getTags().contains(tag)) {
+            logger.info("Skipping add tag {} to sermon media {} - already present",  tag, sermonId);
+        }
+        else {
+            sermonMedia.appendTag(tag);
+            logger.info("Added tags {} to sermon media {}", tag, sermonId);
+        }
         return true;
     }
 
@@ -176,10 +217,18 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot remove tag {} from sermon media {} - DNE or private", tag, sermonId);
             return false;
         }
 
-        sermonMedia.removeTag(tag);
+        if  (! sermonMedia.getTags().contains(tag)) {
+            logger.info("Skipping remove tag {} from sermon media {} - not present",  tag, sermonId);
+            return true;
+        }
+        else {
+            sermonMedia.removeTag(tag);
+            logger.info("Removed tags {} from sermon media {}", tag, sermonId);
+        }
         return true;
     }
 
@@ -188,10 +237,12 @@ public class SermonMediaService {
         SermonMedia sermonMedia = getSermonMediaById(sermonId, true);
         // Check that the sermon was accessible (exists, whether published or not).
         if (sermonMedia == null) {
+            logger.warn("Cannot add tags {} to sermon media {} - DNE or private", tags.toString(), sermonId);
             return false;
         }
 
         sermonMedia.setTags(tags);
+        logger.info("Adding tags {} to sermon media {}", tags.toString(), sermonId);
         return true;
     }
 }

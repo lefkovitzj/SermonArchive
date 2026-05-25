@@ -35,11 +35,6 @@ public class SermonMedia {
 
     @Setter
     @Getter
-    @Schema(description = "The S3 object store public access URL for the sermon, if S3 is configured for public access.")
-    private String resourceUrl;
-
-    @Setter
-    @Getter
     @Schema(description = "The speaker who preached the sermon.")
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Speaker speaker;
@@ -60,9 +55,14 @@ public class SermonMedia {
     @Schema(description = "Media is a video if true, audio otherwise.")
     private boolean isVideo;
 
+    @Getter
+    @Setter
+    @Schema(description = "Store the initial upload extension.")
+    private String fileExt;
+
     @Setter
     @Getter
-    @Schema(description = "Media is a public if true, private otherwise.")
+    @Schema(description = "Media is public if true, private otherwise.")
     private boolean isPublished;
 
     @Setter
@@ -83,14 +83,14 @@ public class SermonMedia {
     @Schema(description = "Internal system lastmod time.")
     private LocalDateTime updatedAt;
 
-    public SermonMedia(Integer id, String title, String description, String resourceUrl, Speaker speaker, List<String> tags, boolean isVideo, boolean isPublished, String s3Key) {
+    public SermonMedia(Integer id, String title, String description, Speaker speaker, List<String> tags, boolean isVideo, String fileExt, boolean isPublished, String s3Key) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.resourceUrl = resourceUrl;
         this.speaker = speaker;
         this.tags = tags;
         this.isVideo = isVideo;
+        this.fileExt = fileExt;
         this.isPublished = isPublished;
         this.s3Key = s3Key;
     }
