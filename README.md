@@ -117,7 +117,9 @@ troubleshooting errors I haven't seen before.
   - [x] Date
 - [x] Add logging
 - [ ] Containerize for AWS ECR
-  - [ ] Create GitHub action to rebuild and publish to ECR 
+  - [x] Create multistage Dockerfile
+  - [ ] Create GitHub action to rebuild and publish to ECR
+  - [ ] Create GitHub action to rebuild and publish to GHCR
   - [ ] Create GitHub action to rebuild and publish to DockerHub
 - [ ] Add test suite
   - [ ] Define test cases
