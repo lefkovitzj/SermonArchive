@@ -1,5 +1,5 @@
 # --- Stage 1: Build the application ---
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.14-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
 # Cache Maven dependencies.
@@ -26,5 +26,5 @@ COPY --from=build /app/target/*.jar app.jar
 # Expose Spring Boot's default port.
 EXPOSE 8080
 
-# Run with optimized Java 21 flags.
+# Run with Java 21.
 ENTRYPOINT ["java", "-jar", "app.jar"]

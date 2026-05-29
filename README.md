@@ -116,9 +116,10 @@ troubleshooting errors I haven't seen before.
   - [x] Preacher/speaker
   - [x] Date
 - [x] Add logging
-- [ ] Containerize for AWS ECR
-  - [ ] Create GitHub action to rebuild and publish to ECR 
-  - [ ] Create GitHub action to rebuild and publish to DockerHub
+- [x] Containerize for AWS ECR
+  - [x] Create multistage Dockerfile
+  - [x] Create toggleable GitHub action to rebuild and publish to ECR
+  - [x] Create GitHub action to rebuild and publish to GHCR and Docker Hub
 - [ ] Add test suite
   - [ ] Define test cases
   - [ ] Create GitHub actions for test CI
