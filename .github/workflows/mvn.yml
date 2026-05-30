@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "task/add-unit-tests" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
