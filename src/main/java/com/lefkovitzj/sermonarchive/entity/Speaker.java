@@ -8,6 +8,7 @@ import java.util.Objects;
 
 @Entity
 public class Speaker {
+    @Getter
     @Id
     @Column(unique = true)
     private String name;
