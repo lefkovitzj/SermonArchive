@@ -29,9 +29,9 @@ jobs:
           DB_PASSWORD: ""
           LOGGING_PROFILE: local
           JWT_SECRET: dummy_secret_key_must_be_long_enough_for_jwt_validation_step
-          S3_ENDPOINT: http://localhost:9000
-          S3_ACCESS_KEY: dummy-access
-          S3_SECRET_KEY: dummy-secret
-          S3_BUCKET_NAME: dummy-bucket
-          S3_REGION: us-east-1
+          -DS3_ENDPOINT: http://localhost:9000
+          -DS3_ACCESS_KEY: dummy-access
+          -DS3_SECRET_KEY: dummy-secret
+          -DS3_BUCKET_NAME: dummy-bucket
+          -DS3_REGION: us-east-1
         run: mvn -B clean test

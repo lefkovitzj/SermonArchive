@@ -32,11 +32,6 @@ class S3ConfigTest {
     void shouldFailToCreateBeanWhenPropertiesAreMissing() {
         this.contextRunner
             .withUserConfiguration(S3Config.class) // Force Spring to load the config.
-            .withPropertyValues(
-                    "s3.endpoint=",
-                    "s3.access-key=",
-                    "s3.secret-key="
-            )
             .run(context -> {
                 // Verify that the Spring context failed to start up.
                 assertThat(context).hasFailed();
