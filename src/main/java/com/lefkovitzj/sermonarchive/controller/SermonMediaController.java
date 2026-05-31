@@ -3,7 +3,6 @@ package com.lefkovitzj.sermonarchive.controller;
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
 import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -46,7 +45,7 @@ public class SermonMediaController {
         if (! churchService.verifyOwnership(churchName, userDetails)) {
             return ResponseEntity.badRequest().body("User '" + userDetails.getUsername() + "' is not authorized to add media for the church '" + churchName + "'");
         }
-        if (!sermonMediaService.isMedia(sermonFile)) {
+        if (!sermonMediaService.isVideo(sermonFile) && !sermonMediaService.isAudio(sermonFile)) {
             return ResponseEntity.badRequest().body("Invalid sermon media file type (" + sermonMediaService.getExt(sermonFile) + ")");
         }
 

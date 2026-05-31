@@ -44,9 +44,10 @@ public class SermonMediaService {
 
     public SermonMediaService(SermonMediaRepository sermonMediaRepository,
                               SpeakerService speakerService,
-                              S3Client s3Client) {
+                              S3Service s3Service) {
         this.speakerService = speakerService;
         this.sermonMediaRepository = sermonMediaRepository;
+        this.s3Service = s3Service;
     }
 
     public String getExt(@NonNull MultipartFile file) {
