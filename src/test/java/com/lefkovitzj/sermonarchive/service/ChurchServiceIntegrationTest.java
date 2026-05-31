@@ -3,6 +3,10 @@ package com.lefkovitzj.sermonarchive.service;
 import com.lefkovitzj.sermonarchive.entity.Church;
 import com.lefkovitzj.sermonarchive.entity.User;
 import com.lefkovitzj.sermonarchive.repository.ChurchRepository;
+import com.lefkovitzj.sermonarchive.repository.UserRepository;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,10 +28,18 @@ public class ChurchServiceIntegrationTest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
     @Test
     void createNewChurchPersistsCorrectly() {
         User owner = new User();
-        owner.setUsername("testuser");
+        owner.setUsername("testowner");
         owner.setPassword("password");
         userService.addUser(owner);
 
@@ -38,6 +50,11 @@ public class ChurchServiceIntegrationTest {
 
         assertThat(savedChurch).isNotNull();
         assertThat(savedChurch.getName()).isEqualTo(churchName);
-        assertThat(savedChurch.getOwner().getUsername()).isEqualTo("testuser");
+        assertThat(savedChurch.getOwner().getUsername()).isEqualTo("testowner");
+    }
+
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
     }
 }
