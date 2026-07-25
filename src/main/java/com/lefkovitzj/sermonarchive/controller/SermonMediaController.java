@@ -1,6 +1,7 @@
 package com.lefkovitzj.sermonarchive.controller;
 
 import com.lefkovitzj.sermonarchive.entity.SermonMedia;
+import com.lefkovitzj.sermonarchive.entity.Speaker;
 import com.lefkovitzj.sermonarchive.service.ChurchService;
 import com.lefkovitzj.sermonarchive.service.SermonMediaService;
 import org.slf4j.Logger;
@@ -35,10 +36,16 @@ public class SermonMediaController {
     /* Upload, download, and stream sermon media. */
     @PostMapping(value = "/add")
     public ResponseEntity<String> addSermonMedia(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute SermonMedia newSermonMedia,
+            @AuthenticationPrincipal(errorOnInvalidType = true) UserDetails userDetails,
+            @RequestParam("title") String title,
+            @RequestParam("speaker")  String speaker,
             @RequestParam("sermonFile") MultipartFile sermonFile,
             @RequestParam("churchName") String churchName) {
+        SermonMedia newSermonMedia = new SermonMedia();
+        newSermonMedia.setTitle(title);
+        newSermonMedia.setSpeaker(new Speaker(speaker));
+        newSermonMedia.setChurch(churchService.getChurchByName(churchName));
+
         if (! churchService.churchExists(churchName)) {
             return ResponseEntity.badRequest().body("Media cannot be added to non-existent church '" + churchName + "'");
         }
