@@ -22,7 +22,8 @@ import java.util.Objects;
     private ChurchRepository  churchRepository;
     private UserService userService;
 
-    public ChurchService(UserService userService) {
+    public ChurchService(ChurchRepository churchRepository, UserService userService) {
+        this.churchRepository = churchRepository;
         this.userService = userService;
     }
 

@@ -23,7 +23,6 @@ public class SermonMediaService {
     @Autowired
     private S3Service s3Service;
     private SpeakerService speakerService;
-    private final S3Client s3Client;
     private final SermonMediaRepository sermonMediaRepository;
 
     public final List<String> videoFileExts = List.of(
@@ -45,15 +44,20 @@ public class SermonMediaService {
 
     public SermonMediaService(SermonMediaRepository sermonMediaRepository,
                               SpeakerService speakerService,
-                              S3Client s3Client) {
-        this.s3Client = s3Client;
+                              S3Service s3Service) {
         this.speakerService = speakerService;
         this.sermonMediaRepository = sermonMediaRepository;
+        this.s3Service = s3Service;
     }
 
     public String getExt(@NonNull MultipartFile file) {
         /* Get the file extension. */
-        return  file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1);
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.contains(".")) {
+            // Unable to get an extension.
+            return "";
+        }
+        return  filename.substring(filename.lastIndexOf(".")+1);
     }
     public boolean isVideo(MultipartFile file) {
         /* Check whether the file is an accepted video file. */
@@ -63,38 +67,24 @@ public class SermonMediaService {
         /* Check whether the file is an accepted audio file. */
         return audioFileExts.contains(getExt(file)) && audioFileMimeTypes.contains(file.getContentType());
     }
-    public boolean isMedia(MultipartFile file) {
-        /* Check whether the file is an accepted media (audio or video) file. */
-        return isVideo(file) || isAudio(file);
-    }
 
     public List<SermonMedia> getSermonMedia() {
         return sermonMediaRepository.findAll();
     }
     public List<SermonMedia> getSermonMediaByTag(String tag) {
         /* Get all sermon media with a given tag. */
-        return sermonMediaRepository.findAll()
-                .stream()
-                .filter(
-                        sermonMedia -> sermonMedia.containsTag(tag)
-                ).toList();
+        return sermonMediaRepository
+                .findByTagsContaining(tag);
     }
 
     public List<SermonMedia> getSermonMediaBySpeaker(String speaker) {
         /* Get all sermon media from a given speaker. */
-        Speaker querySpeaker = speakerService.getSpeakerByName(speaker);
-        return sermonMediaRepository.findAll()
-                .stream()
-                .filter(
-                        sermonMedia -> Objects.equals(sermonMedia.getSpeaker(), querySpeaker)
-                ).toList();
+        return sermonMediaRepository
+                .findBySpeakerContaining(speaker);
     }
     public List<SermonMedia> getSermonMediaBetweenTimes(LocalDateTime  start, LocalDateTime end) {
-        return sermonMediaRepository.findAll()
-                .stream()
-                .filter(
-                        sermonMedia -> (start.isBefore(sermonMedia.getSermonDatetime()) && end.isAfter(sermonMedia.getSermonDatetime()))
-                ).toList();
+        return sermonMediaRepository
+                .findBySermonDatetimeBetween(start, end);
     }
 
     @Transactional
