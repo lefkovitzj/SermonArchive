@@ -96,11 +96,21 @@ public class SermonMedia {
     }
 
     public void appendTag(String tag) {
-        this.tags.add(tag);
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        if (! this.containsTag(tag)) {
+            this.tags.add(tag);
+        }
     }
 
     public void removeTag(String tag) {
-        this.tags.remove(tag);
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        if (this.containsTag(tag)) {
+            this.tags.remove(tag);
+        }
     }
 
     public boolean containsTag(String tag) {

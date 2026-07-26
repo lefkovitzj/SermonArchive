@@ -1,6 +1,7 @@
 package com.lefkovitzj.sermonarchive.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.util.Objects;
 
 @Entity
 public class Speaker {
+    @Getter
     @Id
     @Column(unique = true)
     private String name;

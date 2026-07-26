@@ -1,0 +1,27 @@
+# src/test/resources/application-test.yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:sermondb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  docker:
+    compose:
+      skip:
+        mode: always
+
+# Safe dummy values for environment dependencies
+LOGGING_PROFILE: local
+JWT_SECRET: dummy_secret_key_must_be_long_enough_for_jwt_validation_step
+
+S3_ENDPOINT: http://localhost:9000
+S3_ACCESS_KEY: dummy-access
+S3_SECRET_KEY: dummy-secret
+S3_BUCKET_NAME: dummy-bucket
+S3_REGION: us-east-1
