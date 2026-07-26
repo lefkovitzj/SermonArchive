@@ -120,9 +120,9 @@ troubleshooting errors I haven't seen before.
   - [x] Create multistage Dockerfile
   - [x] Create toggleable GitHub action to rebuild and publish to ECR
   - [x] Create GitHub action to rebuild and publish to GHCR and Docker Hub
-- [ ] Add test suite
-  - [ ] Define test cases
-  - [ ] Create GitHub actions for test CI
+- [x] Add test suite
+  - [x] Define test cases
+  - [x] Create GitHub actions for test CI
 
 See the [open issues](https://github.com/lefkovitzj/SermonArchive/issues) for a full list of proposed features (and known issues).
 
